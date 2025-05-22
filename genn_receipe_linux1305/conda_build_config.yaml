@@ -1,5 +1,8 @@
-cudatoolkit:
-  - 11.8
+python:
+  - 3.11
 
-gcc_linux-64:
-  - 11       # This is compatible with CUDA 11.8
+gcc:
+  - 11
+
+cudatoolkit:
+  - 11.7
