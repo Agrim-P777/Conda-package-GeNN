@@ -1,0 +1,50 @@
+{% set name = "genn" %}
+{% set version = "4.8.1" %}
+
+package:
+  name: {{ name }}
+  version: {{ version }}
+
+source:
+  git_url: https://github.com/genn-team/genn.git
+  git_tag: v{{ version }}
+
+build:
+  number: 0
+  script: bash build.sh
+  skip: true  # [win]
+  run_exports:
+    - {{ pin_subpackage("genn", max_pin="x.x") }}
+
+requirements:
+  build:
+    - {{ compiler('c') }}
+    - {{ compiler('cxx') }}
+    - make
+    - cmake
+    - cudatoolkit-dev
+  host:
+    - python
+  run:
+    - python
+    - cudatoolkit >=11.2,<12
+
+test:
+  commands:
+    - test -f $PREFIX/include/genn/genn.h
+    - test -d $PREFIX/lib
+  requires:
+    - cmake
+    - cudatoolkit
+
+about:
+  home: https://github.com/genn-team/genn
+  license: MIT
+  license_family: MIT
+  summary: GPU-enhanced Neuronal Networks - a code generation framework for spiking neural networks.
+  description: |
+    GeNN is a GPU-enhanced simulator framework for spiking neural networks, designed to compile models to run efficiently on NVIDIA GPUs using CUDA.
+
+extra:
+  recipe-maintainers:
+    - your-github-username
