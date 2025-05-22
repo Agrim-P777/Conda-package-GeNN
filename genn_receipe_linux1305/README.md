@@ -99,7 +99,7 @@ It is highly customizable and integrates well with other neural simulators.
 
 ## 🧑‍💻 Maintainers
 
-`your-github-username`
+`to be updated`
 
 ---
 
