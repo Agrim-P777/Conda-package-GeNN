@@ -1,6 +1,6 @@
 package:
   name: pygenn
-  version: "0.0.0"  # Will be overridden by version.txt in setup.py
+  version: "5.2.0" 
 
 source:
   git_url: https://github.com/genn-team/genn.git
@@ -21,12 +21,8 @@ requirements:
     - make
     - python
     - setuptools
-    - pip
-    - wheel
     - pybind11
     - psutil
-    - wget #To get CUDA installations 
-    - pkg-config
     - cudatoolkit-dev 11.7  # nvcc and cuda headers
 
   host:
