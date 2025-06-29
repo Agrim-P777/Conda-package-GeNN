@@ -1,0 +1,8 @@
+python:
+  - 3.11
+
+gcc:
+  - 11
+
+cudatoolkit:
+  - 11.7
