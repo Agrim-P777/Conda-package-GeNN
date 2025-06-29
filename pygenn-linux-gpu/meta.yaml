@@ -10,9 +10,7 @@ build:
   number: 0
   script_env:
     - CUDA_PATH
-  script: |
-    export CUDA_PATH="${BUILD_PREFIX}"
-    $PYTHON setup.py install --single-version-externally-managed --record=record.txt
+  script: $PYTHON setup.py install --single-version-externally-managed --record=record.txt
   skip: true  # [not linux]
 
 requirements:
