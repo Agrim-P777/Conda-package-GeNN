@@ -21,7 +21,7 @@ dependencies:
   - cuda-libraries
   - cuda-libraries-dev
 
-  # Optional: include these only if you confirm they exist
+  # Optional: include these only if they exist for the cuda version
   # - cuda-driver-dev
   # - cuda-cublas-dev
 
