@@ -1,0 +1,29 @@
+name: conda-bld-cuda12
+channels:
+  - conda-forge
+  - defaults
+
+dependencies:
+  - python=3.11
+  - gcc=11
+  - gxx=11
+  - make
+  - setuptools
+  - pybind11
+  - psutil
+  - numpy
+
+  # CUDA 12.4 minimal toolchain, no exact patch versions
+  - cuda-version=12.4
+  - cuda-nvcc
+  - cuda-cudart
+  - cuda-cudart-dev
+  - cuda-libraries
+  - cuda-libraries-dev
+
+  # Optional: include these only if you confirm they exist
+  # - cuda-driver-dev
+  # - cuda-cublas-dev
+
+  - conda-build
+  - boa
