@@ -10,7 +10,9 @@ build:
   number: 0
   script_env:
     - CUDA_PATH
-  script: $PYTHON setup.py install --single-version-externally-managed --record=record.txt
+  script: |
+    export CUDA_PATH="${BUILD_PREFIX}"
+    $PYTHON setup.py install --single-version-externally-managed --record=record.txt
   skip: true  # [not linux]
 
 requirements:
@@ -35,6 +37,11 @@ requirements:
     - python
     - numpy
     - psutil
+    - {{ compiler('cxx') }}
+    - make
+    - cuda-nvcc {{ cuda_nvcc }}
+    - cuda-cudart-dev {{ cuda_cudart_dev }}
+    - cuda-libraries-dev {{ cuda_libraries_dev }}
     - cuda-cudart {{ cuda_cudart }}
     - cuda-libraries {{ cuda_libraries }}
     - importlib-metadata  # [py<38]
