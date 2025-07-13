@@ -1,0 +1,19 @@
+name: conda-bld-cpu
+channels:
+  - conda-forge
+  - defaults
+
+dependencies:
+  # Build essentials
+  - python=3.11
+  - gcc=11
+  - gxx=11
+  - make
+  - setuptools
+  - pybind11
+  - psutil
+  - numpy
+
+  # Build tools
+  - conda-build
+  - boa
