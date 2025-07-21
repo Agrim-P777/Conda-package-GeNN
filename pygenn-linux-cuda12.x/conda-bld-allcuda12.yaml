@@ -1,0 +1,21 @@
+name: conda-bld-allcuda12
+channels:
+  - conda-forge
+  - defaults
+
+dependencies:
+  - python=3.11
+  - gcc=11
+  - gxx=11
+  - make
+  - setuptools
+  - pybind11
+  - psutil
+  - numpy
+
+  # Tools needed to build all variants
+  - conda-build
+  - boa
+
+  # Let conda mambabuild resolve the appropriate CUDA version per variant.
+  # Do NOT pin cuda-version or any cuda-* packages here!

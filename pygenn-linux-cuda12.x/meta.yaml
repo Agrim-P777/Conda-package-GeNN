@@ -1,0 +1,69 @@
+package:
+  name: pygenn
+  version: "5.2.0"
+
+source:
+  git_url: https://github.com/genn-team/genn.git
+  git_rev: master  # or replace with a tag like v5.2.0
+
+build:
+  number: 0
+  string: "py{{ PY_VER | replace('.', '') }}_cuda{{ cuda_version | replace('.', '') }}_{{ PKG_BUILDNUM }}"
+  script_env:
+    - CUDA_PATH
+  script: |
+    export CUDA_PATH="${BUILD_PREFIX}"
+    $PYTHON setup.py install --single-version-externally-managed --record=record.txt
+  skip: true  # [not linux]
+
+requirements:
+  build:
+    - {{ compiler('cxx') }}
+    - make
+    - python
+    - setuptools
+    - pybind11
+    - psutil
+    - cuda-nvcc {{ cuda_nvcc }}
+    - cuda-cudart-dev {{ cuda_cudart_dev }}
+    - cuda-libraries-dev {{ cuda_libraries_dev }}
+
+  host:
+    - python
+    - numpy
+    - psutil
+    - pybind11
+
+  run:
+    - python
+    - numpy
+    - psutil
+    - {{ compiler('cxx') }}
+    - make
+    - cuda-version =={{ cuda_version }} #To support all cuda 12.x versions
+    - cuda-nvcc {{ cuda_nvcc }}
+    - cuda-cudart-dev {{ cuda_cudart_dev }}
+    - cuda-libraries-dev {{ cuda_libraries_dev }}
+    - cuda-cudart {{ cuda_cudart }}
+    - cuda-libraries {{ cuda_libraries }}
+    - importlib-metadata  # [py<38]
+
+test:
+  imports:
+    - pygenn
+
+about:
+  home: https://github.com/genn-team/genn
+  license: MIT
+  license_family: MIT
+  license_file: LICENSE
+  summary: "GeNN Python bindings (pygenn) with CUDA backend support"
+  description: |
+    GeNN (GPU enhanced Neuronal Networks) is a code generation framework for
+    accelerating spiking neural network simulations using GPUs.
+    This package provides the Python bindings to use GeNN in Python.
+  dev_url: https://github.com/genn-team/genn
+
+extra:
+  recipe-maintainers:
+    - to-be-decided

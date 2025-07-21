@@ -1,0 +1,50 @@
+python:
+  - 3.11
+
+gcc:
+  - 11
+
+cuda_version:
+  - 12.4
+  - 12.5
+  - 12.6
+  - 12.8
+  - 12.9
+
+cuda_cudart:
+  - 12.4
+  - 12.5
+  - 12.6
+  - 12.8
+  - 12.9
+
+cuda_cudart_dev:
+  - 12.4
+  - 12.5
+  - 12.6
+  - 12.8
+  - 12.9
+
+cuda_nvcc:
+  - 12.4
+  - 12.5
+  - 12.6
+  - 12.8
+  - 12.9
+
+cuda_libraries:
+  - 12.4
+  - 12.5
+  - 12.6
+  - 12.8
+  - 12.9
+
+cuda_libraries_dev:
+  - 12.4
+  - 12.5
+  - 12.6
+  - 12.8
+  - 12.9
+
+zip_keys:
+  - [cuda_version, cuda_cudart, cuda_cudart_dev, cuda_nvcc, cuda_libraries, cuda_libraries_dev]
