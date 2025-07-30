@@ -1,0 +1,82 @@
+package:
+  name: pygenn-win
+  version: "5.2.0"
+
+source:
+  git_url: https://github.com/genn-team/genn.git
+  git_rev: agrim_cuda_paths
+
+build:
+  number: 0
+  script_env:
+    - CUDA_PATH
+  script: |
+    {% if win %}
+    :: Set CUDA path to conda's modular CUDA installation
+    set CUDA_PATH=%BUILD_PREFIX%\Library
+    :: Explicitly set CudaLibraryPath for setup.py fallback
+    set CudaLibraryPath=%BUILD_PREFIX%\Library\lib
+    :: Add include and lib paths for MSVC build
+    set INCLUDE=%BUILD_PREFIX%\Library\include;%INCLUDE%
+    set LIB=%BUILD_PREFIX%\Library\lib;%LIB%
+    set PATH=%BUILD_PREFIX%\Library\bin;%PATH%
+    "%PYTHON%" setup.py install --single-version-externally-managed --record=record.txt
+    {% else %}
+    export CUDA_PATH="${BUILD_PREFIX}"
+    $PYTHON setup.py install --single-version-externally-managed --record=record.txt
+    {% endif %}
+
+
+
+requirements:
+  build:
+    - {{ compiler('cxx') }}
+    - python
+    - setuptools
+    - pybind11
+    - psutil
+    # - cmake       
+    # - ninja     
+    - vs2022_win-64  # [win]
+    - cuda-nvcc {{ cuda_nvcc }}
+    - cuda-cudart-dev {{ cuda_cudart_dev }}
+    - cuda-libraries-dev {{ cuda_libraries_dev }}
+
+  host:
+    - python
+    - numpy
+    - psutil
+    - pybind11
+    - cuda-cudart-dev
+
+  run:
+    - python
+    - numpy
+    - psutil
+    - {{ compiler('cxx') }}
+    - cuda-nvcc {{ cuda_nvcc }}
+    - cuda-cudart-dev {{ cuda_cudart_dev }}
+    - cuda-libraries-dev {{ cuda_libraries_dev }}
+    - cuda-cudart {{ cuda_cudart }}
+    - cuda-libraries {{ cuda_libraries }}
+    - importlib-metadata  # [py<38]
+
+test:
+  imports:
+    - pygenn
+
+about:
+  home: https://github.com/genn-team/genn
+  license: MIT
+  license_family: MIT
+  license_file: LICENSE
+  summary: "GeNN Python bindings (pygenn) with CUDA backend support"
+  description: |
+    GeNN (GPU enhanced Neuronal Networks) is a code generation framework for
+    accelerating spiking neural network simulations using GPUs.
+    This package provides the Python bindings to use GeNN in Python.
+  dev_url: https://github.com/genn-team/genn
+
+extra:
+  recipe-maintainers:
+    - to-be-decided
