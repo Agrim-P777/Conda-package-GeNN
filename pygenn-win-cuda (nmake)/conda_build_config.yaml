@@ -1,0 +1,28 @@
+python:
+  - 3.11
+
+# Compiler selection
+cxx_compiler:
+  - vs2022        # [win]
+  - gcc           # [linux]
+
+# GCC version for Linux builds
+gcc:
+  - 11            # [linux]
+
+cuda_version:
+  - 12.4
+
+cuda_cudart:
+  - 12.4
+cuda_cudart_dev:
+  - 12.4
+cuda_nvcc:
+  - 12.4
+cuda_libraries:
+  - 12.4
+cuda_libraries_dev:
+  - 12.4
+
+zip_keys:
+  - [cuda_version, cuda_cudart, cuda_cudart_dev, cuda_nvcc, cuda_libraries, cuda_libraries_dev]

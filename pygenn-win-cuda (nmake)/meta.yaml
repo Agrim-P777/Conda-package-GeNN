@@ -1,0 +1,78 @@
+package:
+  name: pygenn-win
+  version: "5.2.0"
+
+source:
+  path: F:/Windows/pygenn-win-nmake/genn
+
+build:
+  number: 0
+  script_env:
+    - CUDA_PATH
+    - CudaLibraryPath
+  script: |
+    {% if win %}
+    :: Point GeNN at Conda's modular CUDA so PR #700 picks NMake for generated code
+    set "CUDA_PATH=%BUILD_PREFIX%\Library"
+    :: Let MSBuild projects (for libgenn/backends) link against modular CUDA without the VS CUDA plugin
+    set "CudaLibraryPath=%BUILD_PREFIX%\Library\lib"
+    :: Make sure modular CUDA headers/libs and DLLs are discoverable during build
+    set "INCLUDE=%BUILD_PREFIX%\Library\include;%INCLUDE%"
+    set "LIB=%BUILD_PREFIX%\Library\lib;%LIB%"
+    set "PATH=%BUILD_PREFIX%\Library\bin;%PATH%"
+    "%PYTHON%" setup.py install --single-version-externally-managed --record=record.txt
+    {% else %}
+    export CUDA_PATH="${BUILD_PREFIX}/Library"
+    export CudaLibraryPath="${BUILD_PREFIX}/Library/lib"
+    $PYTHON setup.py install --single-version-externally-managed --record=record.txt
+    {% endif %}
+
+requirements:
+  build:
+    - {{ compiler('cxx') }}
+    - python
+    - setuptools
+    - pybind11
+    - psutil
+    - vs2022_win-64  # provides cl/link/nmake for building libgenn/backends at build time
+    - cuda-nvcc {{ cuda_nvcc }}
+    - cuda-cudart-dev {{ cuda_cudart_dev }}
+    - cuda-libraries-dev {{ cuda_libraries_dev }}
+
+  host:
+    - python
+    - numpy
+    - psutil
+    - pybind11
+    - cuda-cudart-dev
+
+  run:
+    - python
+    - numpy
+    - psutil
+    - cuda-nvcc {{ cuda_nvcc }}
+    - cuda-cudart-dev {{ cuda_cudart_dev }}
+    - cuda-libraries-dev {{ cuda_libraries_dev }}
+    - cuda-cudart {{ cuda_cudart }}
+    - cuda-libraries {{ cuda_libraries }}
+    - importlib-metadata  # [py<38]
+
+test:
+  imports:
+    - pygenn
+
+about:
+  home: https://github.com/genn-team/genn
+  license: MIT
+  license_family: MIT
+  license_file: LICENSE
+  summary: "GeNN Python bindings (pygenn) with CUDA backend support"
+  description: |
+    GeNN (GPU enhanced Neuronal Networks) is a code generation framework for
+    accelerating spiking neural network simulations using GPUs.
+    This package provides the Python bindings to use GeNN in Python.
+  dev_url: https://github.com/genn-team/genn
+
+extra:
+  recipe-maintainers:
+    - to-be-decided
