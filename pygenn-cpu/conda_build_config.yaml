@@ -3,7 +3,6 @@ python:
 
 # Compilers per platform
 c_compiler:
-  - gcc      # [linux]
   - clang    # [osx]
 
 cxx_compiler:
