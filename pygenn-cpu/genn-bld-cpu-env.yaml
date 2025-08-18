@@ -1,0 +1,21 @@
+name: genn-bld-cpu-env
+channels:
+  - conda-forge
+dependencies:
+  # Core conda-build tooling
+  - conda
+  - conda-build
+  - boa        # provides mambabuild command
+  - mamba
+
+  # Python & helpers
+  - python=3.11
+  - pip
+
+  # Build requirements from recipe
+  - setuptools
+  - pybind11
+  - psutil
+  - cmake      # [win]
+  - ninja      # [win]
+  - vs2022_win-64  # [win]
