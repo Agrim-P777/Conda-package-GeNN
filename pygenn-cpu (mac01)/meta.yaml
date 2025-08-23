@@ -1,0 +1,124 @@
+{% set name = "pygenn-cpu" %}
+{% set version = "5.2.0" %}
+
+package:
+  name: {{ name }}
+  version: {{ version }}
+
+source:
+  git_url: https://github.com/genn-team/genn.git
+  git_rev: master
+
+build:
+  number: 0
+  script: |
+    {% if win %}
+    :: Force short build path to avoid Windows path length issues
+    set CONDA_BLD_PATH=C:\bld
+
+    :: CPU-only build: disable CUDA
+    set CUDA_PATH=
+    "%PYTHON%" setup.py install --single-version-externally-managed --record=record.txt
+
+    {% else %}
+    # CPU-only build (Linux & macOS): disable CUDA
+    unset CUDA_PATH
+
+    {% if osx %}
+    # macOS toolchain hints
+    export LTO_LIBRARY="$BUILD_PREFIX/lib/libLTO.dylib"
+    export CPPFLAGS="$CPPFLAGS -I$PREFIX/include"
+    export CFLAGS="$CFLAGS -I$PREFIX/include"
+    export CXXFLAGS="$CXXFLAGS -I$PREFIX/include"
+
+    # IMPORTANT: force link to libffi and ensure conda lib dir is searched at runtime
+    export LDFLAGS="$LDFLAGS -L$PREFIX/lib -Wl,-rpath,$PREFIX/lib -lffi"
+    {% endif %}
+
+    $PYTHON setup.py install --single-version-externally-managed --record=record.txt
+
+    # ---- macOS: place dependent dylibs next to the extension modules ----
+    {% if osx %}
+    set -x
+    echo "SP_DIR=$SP_DIR"
+    for d in "$SRC_DIR/pygenn" "$SRC_DIR/src/genn/genn"; do
+      if [ -f "$d/libgenn_dynamic.dylib" ]; then
+        cp -v "$d/libgenn_dynamic.dylib" "$SP_DIR/pygenn/"
+      fi
+      if [ -f "$d/libgenn_single_threaded_cpu_backend_dynamic.dylib" ]; then
+        cp -v "$d/libgenn_single_threaded_cpu_backend_dynamic.dylib" "$SP_DIR/pygenn/"
+      fi
+    done
+
+    if [ ! -f "$SP_DIR/pygenn/libgenn_dynamic.dylib" ]; then
+      echo "ERROR: libgenn_dynamic.dylib not found to package" 1>&2
+      exit 1
+    fi
+
+    install_name_tool -id "@loader_path/libgenn_dynamic.dylib" \
+      "$SP_DIR/pygenn/libgenn_dynamic.dylib" || true
+    if [ -f "$SP_DIR/pygenn/libgenn_single_threaded_cpu_backend_dynamic.dylib" ]; then
+      install_name_tool -id "@loader_path/libgenn_single_threaded_cpu_backend_dynamic.dylib" \
+        "$SP_DIR/pygenn/libgenn_single_threaded_cpu_backend_dynamic.dylib" || true
+    fi
+
+    # Ensure each extension can resolve the local dylibs and its own @loader_path
+    for so in "$SP_DIR/pygenn/"*.so; do
+      install_name_tool -change "@loader_path/libgenn_dynamic.dylib" \
+        "@loader_path/libgenn_dynamic.dylib" "$so" || true
+      install_name_tool -change "@loader_path/libgenn_single_threaded_cpu_backend_dynamic.dylib" \
+        "@loader_path/libgenn_single_threaded_cpu_backend_dynamic.dylib" "$so" || true
+      install_name_tool -add_rpath "@loader_path" "$so" || true
+    done
+    set +x
+    {% endif %}
+    {% endif %}
+  skip: false  # Build for all OS
+
+requirements:
+  build:
+    - {{ compiler('cxx') }}
+    - make                     # [not win]
+    - python
+    - setuptools
+    - pybind11
+    - psutil
+    - cctools                  # [osx]
+    - llvm-tools               # [osx]
+  host:
+    - python
+    - {{ pin_compatible('numpy') }}
+    - psutil
+    - pybind11
+    - libcxx                   # [osx]
+    - libffi                   # [osx]
+  run:
+    - python
+    - {{ pin_compatible('numpy') }}
+    - psutil
+    - libcxx                   # [osx]
+    - libffi                   # [osx]
+    - importlib-metadata       # [py<38]
+
+test:
+  # If you still hit import-time resolution weirdness on some Macs,
+  # uncomment the commands block to pre-load ctypes (which loads libffi)
+  # commands:
+  #   - python - <<'PY'\nimport ctypes; import pygenn; print("ok:", pygenn.__file__)\nPY
+  imports:
+    - pygenn
+
+about:
+  home: https://github.com/genn-team/genn
+  license: MIT
+  license_file: LICENSE
+  summary: "CPU-only PyGeNN"
+  description: |
+    GeNN with single-threaded CPU backend only. No CUDA required.
+  dev_url: https://github.com/genn-team/genn
+
+extra:
+  recipe-maintainers:
+    - Agrim-P777
+    - tnowotny
+    - neworderofjamie
