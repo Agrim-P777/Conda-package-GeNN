@@ -1,0 +1,14 @@
+python:
+  - 3.11
+
+numpy:
+  - 2.0
+
+gcc:
+  - 11
+
+cxx_compiler:
+  - vs2022  # [win]
+
+vc:
+  - 14      # [win]

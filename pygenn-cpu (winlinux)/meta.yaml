@@ -1,0 +1,65 @@
+{% set name = "pygenn-cpu" %}
+{% set version = "5.2.0" %}
+
+package:
+  name: {{ name }}
+  version: {{ version }}
+
+source:
+  git_url: https://github.com/genn-team/genn.git
+  git_rev: master
+
+build:
+  number: 0
+  script: |
+    {% if win %}
+    :: Force short build path to avoid Windows path length issues
+    set CONDA_BLD_PATH=C:\bld
+    :: Disable CUDA
+    set CUDA_PATH=
+    "%PYTHON%" setup.py install --single-version-externally-managed --record=record.txt
+    {% else %}
+    unset CUDA_PATH
+    $PYTHON setup.py install --single-version-externally-managed --record=record.txt
+    {% endif %}
+  skip: false  # Build for all OS
+
+requirements:
+  build:
+    - {{ compiler('cxx') }}
+    - make        # [not win]
+    - python
+    - setuptools
+    - pybind11
+    - psutil
+
+  host:
+    - python
+    - {{ pin_compatible('numpy') }} 
+    - psutil
+    - pybind11
+
+  run:
+    - python
+    - {{ pin_compatible('numpy') }} 
+    - psutil
+    - importlib-metadata  # [py<38]
+
+test:
+  imports:
+    - pygenn
+
+about:
+  home: https://github.com/genn-team/genn
+  license: MIT
+  license_file: LICENSE
+  summary: "CPU-only PyGeNN"
+  description: |
+    GeNN with single-threaded CPU backend only. No CUDA required.
+  dev_url: https://github.com/genn-team/genn
+
+extra:
+  recipe-maintainers:
+    - Agrim-P777
+    - tnowotny
+    - neworderofjamie
