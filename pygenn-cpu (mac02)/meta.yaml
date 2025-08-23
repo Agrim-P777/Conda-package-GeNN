@@ -1,0 +1,58 @@
+{% set name = "pygenn-cpu" %}
+{% set version = "5.2.0" %}
+
+package:
+  name: {{ name }}
+  version: {{ version }}
+
+source:
+  git_url: https://github.com/genn-team/genn.git
+  git_rev: master
+
+build:
+  number: 0
+  skip: false  # Build for all OS# Build for all OS
+
+requirements:
+  build:
+    - {{ compiler('cxx') }}
+    - make                     # [not win]
+    - python
+    - setuptools
+    - pybind11
+    - psutil
+    - cctools                  # [osx]
+    - llvm-tools               # [osx]
+  host:
+    - python
+    - {{ pin_compatible('numpy') }}
+    - psutil
+    - pybind11
+    - libcxx                   # [osx]
+    - libffi                   # [osx]
+  run:
+    - python
+    - {{ pin_compatible('numpy') }}
+    - psutil
+    - libcxx                   # [osx]
+    - libffi                   # [osx]
+    - importlib-metadata       # [py<38]
+
+test:
+  imports:
+    - pygenn
+
+about:
+  home: https://github.com/genn-team/genn
+  license: MIT
+  license_file: LICENSE
+  summary: "CPU-only PyGeNN"
+  description: |
+    GeNN with single-threaded CPU backend only. No CUDA required.
+  dev_url: https://github.com/genn-team/genn
+
+extra:
+  recipe-maintainers:
+    - Agrim-P777
+    - tnowotny
+    - neworderofjamie

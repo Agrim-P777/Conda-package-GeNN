@@ -1,0 +1,24 @@
+name: conda-bld-cpu-macos
+channels:
+  - conda-forge
+  - defaults
+
+dependencies:
+  # Compilers & toolchain
+  - python=3.11
+  - clang
+  - clangxx
+  - libcxx
+  - cctools           # ld64 etc.
+  - llvm-tools        # provides libLTO.dylib
+  - make
+
+  # Python build deps
+  - setuptools
+  - pybind11
+  - psutil
+  - numpy
+
+  # Build tools
+  - conda-build
+  - boa
