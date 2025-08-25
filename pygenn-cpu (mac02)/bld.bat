@@ -3,8 +3,8 @@ REM ===========================
 REM Windows build for pygenn-cpu
 REM ===========================
 
-REM Force short build path to avoid Windows path length issues
-set "CONDA_BLD_PATH=C:\bld"
+@REM REM Force short build path to avoid Windows path length issues
+@REM set "CONDA_BLD_PATH=C:\bld"
 
 REM CPU-only: disable CUDA
 set "CUDA_PATH="
