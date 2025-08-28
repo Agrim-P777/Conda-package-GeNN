@@ -11,7 +11,6 @@ channel_targets:
 # ----------------------------
 # Compilers
 # ----------------------------
-# Put platform selectors on values, not keys
 c_compiler:
   - vs2022        # [win]
   - gcc           # [linux]
@@ -46,6 +45,7 @@ cuda_libraries_dev:
 # Keep CUDA components in lockstep
 zip_keys:
   - [cuda_version, cuda_cudart, cuda_cudart_dev, cuda_nvcc, cuda_libraries, cuda_libraries_dev]
+
 
 
 
