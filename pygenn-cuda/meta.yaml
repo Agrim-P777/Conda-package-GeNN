@@ -11,6 +11,7 @@ source:
 
 build:
   number: 0
+  skip: true  # [not (linux64 or win)]
   string: "py{{ PY_VER | replace('.', '') }}_cuda{{ cuda_version | replace('.', '') }}_{{ PKG_BUILDNUM }}"
   script: |
     {% if win %}
@@ -33,7 +34,7 @@ build:
 requirements:
   build:
     - {{ compiler('cxx') }}
-    - make       #[linux]
+    - make  # [linux]
     - python
     - setuptools
     - pybind11
@@ -92,4 +93,5 @@ extra:
     - Agrim-P777
     - tnowotny
     - neworderofjamie
+
 
