@@ -6,8 +6,8 @@ package:
   version: {{ version }}
 
 source:
-  git_url: https://github.com/genn-team/genn.git
-  git_rev: master 
+  url: https://github.com/genn-team/genn/archive/refs/tags/5.3.0_RC1.tar.gz
+  sha256: f1a6807d15f99d91732cd2484727100e54c39b055bcbe2126e7792d07c776fe3
 
 build:
   number: 0
@@ -92,3 +92,4 @@ extra:
     - Agrim-P777
     - tnowotny
     - neworderofjamie
+
