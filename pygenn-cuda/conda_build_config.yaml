@@ -1,12 +1,23 @@
 # Python ABI
 python:
-  - 3.11
+  - 3.11.* *_cpython
+is_python_min:
+  - true
 
 channel_sources:
   - conda-forge
 
 channel_targets:
   - conda-forge main
+
+# --- C standard library baseline (required for stdlib("c")) ---
+c_stdlib:
+  - sysroot        # [linux]
+  - vs             # [win]
+
+c_stdlib_version:
+  - 2.17           # [linux]  # glibc baseline
+  - 2022           # [win]    # MSVC/Universal CRT baseline (VS 2022)
 
 # ----------------------------
 # Compilers
@@ -45,7 +56,3 @@ cuda_libraries_dev:
 # Keep CUDA components in lockstep
 zip_keys:
   - [cuda_version, cuda_cudart, cuda_cudart_dev, cuda_nvcc, cuda_libraries, cuda_libraries_dev]
-
-
-
-
