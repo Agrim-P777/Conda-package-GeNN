@@ -1,9 +1,20 @@
 [![Google Summer of Code](assets/gsoc-banner.png)](https://summerofcode.withgoogle.com/)
 
+---
+
+## 📂 Project Repository
+
+🔗 [Conda-package-GeNN](https://github.com/Agrim-P777/Conda-package-GeNN)  
+This repository contains *all the code, packaging recipes, and documentation* developed during my Google Summer of Code project.
+
+---
+
 # 📑 Table of Contents
 - 🌍 [Google Summer of Code (GSoC)](#-google-summer-of-code-gsoc)
 - 🧠 [About INCF](#-about-incf)
 - ⚡ [About GeNN](#-about-genn)
+- ❓ [Problem Statement](#-problem-statement)
+  - 📦 [Deliverables](#-deliverables)
 - 🎮 [Rise of CUDA in Neural Simulations](#-rise-of-cuda-in-neural-simulations)
 - 📦 [Why Conda (and not PyPI)](#-why-conda-and-not-pypi)
 - 🏗️ [Package Architecture](#️-package-architecture)
@@ -60,6 +71,31 @@ GeNN plays a crucial role in computational neuroscience by:
 
 Through its GPU acceleration, GeNN empowers neuroscientists to explore complex models of brain function that would otherwise be computationally prohibitive.
 
+## ❓ Problem Statement
+
+[GeNN](https://genn-team.github.io/) is a **C++ library** that generates code for efficiently simulating **Spiking Neural Networks (SNNs)** using GPUs.  
+To compile the generated code, GeNN requires a **C++ compiler** and development versions of backend dependencies such as **CUDA**.  
+
+Currently, this means GeNN must be **installed from source**, which can be a barrier for many potential users:
+- Researchers may not have the right compiler or CUDA version installed
+- Installation errors can take hours to resolve
+- New users may be discouraged before even running their first simulation
+
+### 🎯 Project Goal
+
+For this project, I aimed to develop a **Conda (Forge) package** for GeNN which:
+- Handles the installation of all required dependencies (C++, CUDA, libraries)
+- Provides pre-built binaries for Linux, Windows, and macOS
+- Makes installation as simple as:
+
+  ```bash
+  conda install -c conda-forge pygenn-cpu   # CPU-only
+  conda install -c conda-forge pygenn-cuda  # CUDA-enabled
+
+### 📦 Deliverables
+
+- ✅ Conda-Forge recipes for both **CPU** and **CUDA** variants of GeNN
+- ✅ User documentation and installation instructions
 
 ## 🎮 Rise of CUDA in Neural Simulations
 [![NVIDIA](assets/nvidia-cuda-banner.jpg)](https://developer.nvidia.com/cuda-toolkit)  
