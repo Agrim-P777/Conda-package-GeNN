@@ -7,7 +7,13 @@
 - 🎮 [Rise of CUDA in Neural Simulations](#-rise-of-cuda-in-neural-simulations)
 - 📦 [Why Conda (and not PyPI)](#-why-conda-and-not-pypi)
 - 🏗️ [Package Architecture](#️-package-architecture)
-
+- ⚔️ [Challenges Faced and Solutions](#-challenges-faced-and-solutions)
+  - 🌀 [Challenge 1: Transition from CUDA <12.x to CUDA ≥12.x](#-challenge-1-transition-from-cuda-12x-to-cuda-12x)
+  - ⚔️ [Challenge 2: Setting CUDA_PATH After Installation](#-challenge-2-setting-cuda_path-after-installation)
+  - ⚔️ [Challenge 3: Moving Windows Build to NMake + MSBuild](#-challenge-3-moving-windows-build-to-nmake--msbuild)
+  - ⚔️ [Challenge 4: Fixing macOS .dylib Handling in pygenn-cpu](#-challenge-4-fixing-macos-dylib-handling-in-pygenn-cpu)
+- 📦 [Conda-Forge Packages](#-conda-forge-packages)
+- 🌟 [Impact of the Package](#-impact-of-the-package)
 
 ## 🌍 Google Summer of Code (GSoC)
 
@@ -223,5 +229,54 @@ Key technical improvements included:
 
 🔗 [My Pull Request #707 – macOS `.dylib` fix in setup.py](https://github.com/genn-team/genn/pull/707)
 
+## 📦 Conda-Forge Packages
 
+After resolving build system and packaging challenges, we contributed to the **official Conda-Forge recipes** for PyGeNN.
 
+### 🚀 Published Packages
+
+- **pygenn-cuda** → [staged-recipes PR #30899](https://github.com/conda-forge/staged-recipes/pull/30899)
+    - GPU-accelerated build with modular CUDA support
+    - Targets Linux and Windows with reproducible CUDA environments
+- **pygenn-cpu** → [staged-recipes PR #30907](https://github.com/conda-forge/staged-recipes/pull/30907)
+    - Lightweight CPU-only build
+    - Cross-platform support (Linux, Windows, macOS) without CUDA dependency
+
+### 🌐 Impact
+
+- Brought **PyGeNN to the Conda-Forge ecosystem**, making installation as simple as:
+    
+    ```bash
+    conda install -c conda-forge pygenn-cpu   # CPU-only
+    conda install -c conda-forge pygenn-cuda  # CUDA-enabled
+    ```
+- Improved **discoverability, reproducibility, and accessibility** for neuroscience researchers and developers worldwide.
+
+## 🌟 Impact of the Package
+
+Before our Conda-Forge packages, users had to **install GeNN from source**:  
+- Clone the repository  
+- Configure compilers and CUDA toolchains manually  
+- Build the C++ backend  
+- Troubleshoot platform-specific errors (Linux, Windows, macOS)  
+
+This process was **time-consuming and error-prone**, often taking **hours** for new users.
+
+### 🚀 Improvements with Conda Packages
+- Installation reduced to a **single command**:  
+  ```bash
+  conda install -c conda-forge pygenn-cpu   # CPU-only
+  conda install -c conda-forge pygenn-cuda  # CUDA-enabled
+  ```
+- **No manual compilation** needed — all binaries are pre-built for the target platform
+- **Cross-platform availability**: Linux, Windows, and macOS
+- **Pinned toolchains and CUDA versions** ensure reproducibility and stability
+- Eliminates setup barriers, letting researchers focus on **science, not build systems**
+
+### 🔬 Impact on Researchers
+
+- Decreased installation time from **hours → minutes**
+- Made GeNN accessible to **a wider audience**, including those without deep build/DevOps expertise
+- Strengthened the reliability of **neuroscience workflows** by providing reproducible environments
+
+In short, this packaging effort turned GeNN from a **complex source-based project** into an **accessible plug-and-play library** for the neuroscience community!
