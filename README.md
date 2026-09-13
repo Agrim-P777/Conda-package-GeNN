@@ -4,27 +4,54 @@
 
 ## Project Repository
 
-🔗 [Conda-package-GeNN](https://github.com/Agrim-P777/Conda-package-GeNN)  
+[Conda-package-GeNN](https://github.com/Agrim-P777/Conda-package-GeNN)  
 This repository contains *all the code, packaging recipes, and documentation* developed during my Google Summer of Code project.
 
 ---
 
-#  Table of Contents
-- [Google Summer of Code (GSoC)](#-google-summer-of-code-gsoc)
-- [About INCF](#-about-incf)
-- [About GeNN](#-about-genn)
-- [Problem Statement](#-problem-statement)
-  -  [Deliverables](#-deliverables)
--  [Rise of CUDA in Neural Simulations](#-rise-of-cuda-in-neural-simulations)
--  [Why Conda (and not PyPI)](#-why-conda-and-not-pypi)
--  [Package Architecture](#️-package-architecture)
--  [Challenges Faced and Solutions](#%EF%B8%8F-challenges-faced-and-solutions)
-  -  [Challenge 1: Transition from CUDA <12.x to CUDA ≥12.x](#-challenge-1-transition-from-cuda-12x-to-cuda-12x)
-  -  [Challenge 2: Setting CUDA_PATH After Installation](#%EF%B8%8F-challenge-2-setting-cuda_path-after-installation)
-  -  [Challenge 3: Moving Windows Build to NMake + MSBuild](#%EF%B8%8F-challenge-3-moving-windows-build-to-nmake--msbuild)
-  -  [Challenge 4: Fixing macOS .dylib Handling in pygenn-cpu](#%EF%B8%8F-challenge-4-fixing-macos-dylib-handling-in-pygenn-cpu)
--  [Conda-Forge Packages](#-conda-forge-packages)
--  [Impact of the Package](#-impact-of-the-package)
+# Table of Contents
+- [Repository Structure](#repository-structure)
+- [Google Summer of Code (GSoC)](#google-summer-of-code-gsoc)
+- [About INCF](#about-incf)
+- [About GeNN](#about-genn)
+- [Problem Statement](#problem-statement)
+  - [Deliverables](#deliverables)
+- [Rise of CUDA in Neural Simulations](#rise-of-cuda-in-neural-simulations)
+- [Why Conda (and not PyPI)](#why-conda-and-not-pypi)
+- [Package Architecture](#package-architecture)
+- [Challenges Faced and Solutions](#challenges-faced-and-solutions)
+  - [Challenge 1: Transition from CUDA <12.x to CUDA ≥12.x](#challenge-1-transition-from-cuda-12x-to-cuda-12x)
+  - [Challenge 2: Setting CUDA_PATH After Installation](#challenge-2-setting-cuda_path-after-installation)
+  - [Challenge 3: Moving Windows Build to NMake + MSBuild](#challenge-3-moving-windows-build-to-nmake--msbuild)
+  - [Challenge 4: Fixing macOS .dylib Handling in pygenn-cpu](#challenge-4-fixing-macos-dylib-handling-in-pygenn-cpu)
+- [Conda-Forge Packages](#conda-forge-packages)
+- [Impact of the Package](#impact-of-the-package)
+
+---
+## Repository Structure
+
+```
+Conda-package-GeNN/
+├── Conda_Forge/pygenn-suite/   ← Final recipe submitted to Conda-Forge (source of truth)
+├── dev/                        ← All intermediate recipes from the development process
+│   ├── phase-1_linux-cuda11.7/          First CUDA recipe (monolithic cudatoolkit 11.7)
+│   ├── phase-2_linux-cpu/               First CPU recipe (Linux-only)
+│   ├── phase-3_linux-cuda12.4/          Modular CUDA, pinned to 12.4
+│   ├── phase-4_linux-cuda12.x/          Generalized to all CUDA 12.x versions
+│   ├── phase-5a_windows-cpu/            Windows CPU recipe exploration
+│   ├── phase-5b_cross-platform-cpu/     Cross-platform CPU (Linux/macOS/Windows)
+│   ├── phase-5c_winlinux-cpu/           Refined CPU recipe (Windows+Linux, pin_compatible numpy)
+│   ├── phase-6a_windows-cuda-msbuild/   Windows CUDA with MSBuild only
+│   ├── phase-6b_windows-cuda-nmake/     Windows CUDA with NMake+MSBuild hybrid (PR #705)
+│   ├── phase-7a_macos-cpu-inline/       macOS dylib fix inlined in meta.yaml
+│   ├── phase-7b_macos-cpu-buildsh/      macOS dylib fix refactored into build.sh (PR #707)
+│   └── phase-8_pre-final-cuda/          Separate pygenn-cuda package (pre-unification)
+│       ├── early-tests/                 Early VA benchmark + CUDA smoketest
+│       └── tests/                       CUDA smoketest for this recipe
+└── assets/                     Images used in this README
+```
+
+See [dev/README.md](dev/README.md) for a phase-by-phase explanation of what each recipe tried, what broke, and why it was replaced.
 
 ---
 ## Google Summer of Code (GSoC)
@@ -40,7 +67,7 @@ Contributors work with open source organizations under the guidance of mentors t
 - **66.3% of contributors** had *no prior open source experience*, showing GSoC’s accessibility  
 - A **three-week Community Bonding period** helps contributors and mentors plan and get oriented before coding  
 
-🔗 [Read more on the official announcement](https://opensource.googleblog.com/2025/05/gsoc-2025-we-have-our-contributors.html)
+[Read more on the official announcement](https://opensource.googleblog.com/2025/05/gsoc-2025-we-have-our-contributors.html)
 
 ---
 
@@ -149,13 +176,16 @@ We designed the package to provide **two build variants** of GeNN:
 
 ---
 ###  Structure
-- Separate Conda recipes: `pygenn-cpu` and `pygenn-cuda`  
-- Each recipe pins Python, NumPy ABI, and (for CUDA builds) modular CUDA components like `cuda-nvcc`, `cuda-cudart`, and `cuda-libraries`  
-- Shared test suite ensures both variants behave consistently  
+- A **single unified recipe** (`Conda_Forge/pygenn-suite/`) produces both CPU and CUDA variants from one `meta.yaml` using the `{{ compiler('cuda') }}` / `cuda_compiler_version` guard
+- The build string (`cpu*` vs `cuda*`) lets Conda automatically select the right variant based on whether an NVIDIA driver is present
+- Each build pins Python, NumPy ABI, and (for CUDA builds) modular CUDA components like `cuda-nvcc`, `cuda-cudart`, `cuda-cccl`, and `libcurand-dev`
+- Shared test suite (`tests/run_pygenn_cpu_smoketest.py` + `tests/run_pygenn_cuda_smoketest.py`) ensures both variants behave correctly
 
-This dual-architecture approach makes GeNN more **accessible and reproducible**, whether on laptops or GPU clusters.  
+> **Development history:** The recipe started as separate `pygenn-cpu` and `pygenn-cuda` packages. After Conda-Forge review feedback, they were merged into the unified `pygenn` recipe. See [`dev/`](dev/) for the full iteration history.
 
-🔗 [Read more on the detailed package structure](https://github.com/Agrim-P777/Conda-package-GeNN/wiki/05.-GeNN-%E2%80%90-Conda-Package-Structure:-CPU%E2%80%90Only-and-CUDA%E2%80%90Enabled)
+This unified approach makes GeNN more **accessible and reproducible**, whether on laptops or GPU clusters.  
+
+[Read more on the detailed package structure](https://github.com/Agrim-P777/Conda-package-GeNN/wiki/05.-GeNN-%E2%80%90-Conda-Package-Structure:-CPU%E2%80%90Only-and-CUDA%E2%80%90Enabled)
 
 ---
 ##  Challenges Faced and Solutions
@@ -164,14 +194,14 @@ This dual-architecture approach makes GeNN more **accessible and reproducible**,
 
 Initially, our package was built for **CUDA 11.7**, which used a **monolithic toolkit package**.
 
-👉 [Example: CUDA 11.7 recipe](https://github.com/Agrim-P777/Conda-package-GeNN/blob/main/pygenn-linux-cuda11.7/meta.yaml)
+[Example: CUDA 11.7 recipe](dev/phase-1_linux-cuda11.7/meta.yaml)
 
 However, starting with **CUDA 12.x**, Conda-Forge adopted a **modular CUDA packaging** system:
 
 - Instead of a single `cudatoolkit` package
 - CUDA is split into components like `cuda-nvcc`, `cuda-cudart`, `cuda-libraries`, `cuda-libraries-dev`, etc.
 
-🔗 [Detailed explanation: Pre-12 vs Post-12 CUDA packaging](https://github.com/Agrim-P777/Conda-package-GeNN/wiki/06.-Understanding-CUDA-Packaging-in-Conda%E2%80%90Forge:-Pre%E2%80%9012-vs-Post%E2%80%9012-Versions)
+[Detailed explanation: Pre-12 vs Post-12 CUDA packaging](https://github.com/Agrim-P777/Conda-package-GeNN/wiki/06.-Understanding-CUDA-Packaging-in-Conda%E2%80%90Forge:-Pre%E2%80%9012-vs-Post%E2%80%9012-Versions)
 
 ###  Our Solution
 
@@ -199,7 +229,7 @@ the **`CUDA_PATH` environment variable** was **not automatically set** in the Co
 - This caused issues on both **Linux** and **Windows**, where users needed `CUDA_PATH` for compiling and running GeNN models.
 - Without it, the CUDA backend could not be located properly by the build system.
 
-🔗 [Reference: post-link script design](https://github.com/Agrim-P777/Conda-package-GeNN/wiki/08.-Including-a-post%E2%80%90link.sh-script-in-the-Conda-Package)
+[Reference: post-link script design](https://github.com/Agrim-P777/Conda-package-GeNN/wiki/08.-Including-a-post%E2%80%90link.sh-script-in-the-Conda-Package)
 
 ### Our Solution
 
@@ -245,7 +275,7 @@ GeNN’s requirement for **runtime code compilation** of models.
 This migration improved reliability and made the Windows build **much closer to Linux in flexibility**,  
 while also aligning with Conda’s CUDA packaging best practices.  
 
-🔗 [My Pull Request #705 – robust CUDA lib path resolution for Conda & system installs](https://github.com/genn-team/genn/pull/705)
+[My Pull Request #705 – robust CUDA lib path resolution for Conda & system installs](https://github.com/genn-team/genn/pull/705)
 
 ### Challenge 4: Fixing macOS `.dylib` Handling in `pygenn-cpu`
 
@@ -274,7 +304,7 @@ Key technical improvements included:
 - Improved **cross-platform parity**, since Linux `.so` handling was already stable.  
 - Made the CPU-only build truly **portable** across Conda environments on macOS.  
 
-🔗 [My Pull Request #707 – macOS `.dylib` fix in setup.py](https://github.com/genn-team/genn/pull/707)
+[My Pull Request #707 – macOS `.dylib` fix in setup.py](https://github.com/genn-team/genn/pull/707)
 
 ---
 ## Conda-Forge Packages
@@ -283,12 +313,15 @@ After resolving build system and packaging challenges, we contributed to the **o
 
 ### Published Packages
 
+Initial staged-recipes submissions (separate packages, then consolidated):
 - **pygenn-cuda** → [staged-recipes PR #30899](https://github.com/conda-forge/staged-recipes/pull/30899)
     - GPU-accelerated build with modular CUDA support
     - Targets Linux and Windows with reproducible CUDA environments
 - **pygenn-cpu** → [staged-recipes PR #30907](https://github.com/conda-forge/staged-recipes/pull/30907)
     - Lightweight CPU-only build
     - Cross-platform support (Linux, Windows, macOS) without CUDA dependency
+
+These were subsequently merged into a **single unified `pygenn` recipe** ([`Conda_Forge/pygenn-suite/`](Conda_Forge/pygenn-suite/)) that builds both variants from one `meta.yaml`.
 
 ### Impact
 
